@@ -43,10 +43,10 @@ int main () {
     printf("%f\n", get_float_le(&stream));
     printf("%f\n", get_float_be(&stream));
     printf("%lf\n", get_double_le(&stream));
-    printf("%lf\n", get_double_be(&stream));
-    printf("%u\n", get_var_int(&stream));
-    printf("%d\n", get_signed_var_int(&stream));
-    printf("%llu\n", get_var_long(&stream));
-    printf("%lld\n", get_signed_var_long(&stream));
-    return 0;
+	printf("%lf\n", get_double_be(&stream));
+	printf("%u\n", get_var_int(&stream));
+	printf("%d\n", get_signed_var_int(&stream));
+	printf("%llu\n", get_var_long(&stream));
+	printf("%lld\n", get_signed_var_long(&stream));
+	return 0;
 }
