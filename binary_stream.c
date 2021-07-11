@@ -140,15 +140,14 @@ unsigned int get_var_int(binary_stream_t *stream) {
 
 int get_signed_var_int(binary_stream_t *stream) {
 	unsigned int raw = get_var_int(stream);
-	int temp = (((raw << 31) >> 31) ^ raw) >> 1;
-	return temp ^ (raw & (1 << 31));
+	return (raw >> 1) ^ (-1 * (raw & 1));
 }
 
 unsigned long long get_var_long(binary_stream_t *stream) {
 	unsigned long long value = 0;
 	for (int i = 0; i < 70; i += 7) {
 		unsigned char to_read = get_unsigned_byte(stream);
-		value |= ((to_read & 0x7f) << i);
+		value |= (((unsigned long long) (to_read & 0x7f)) << ((unsigned long long) i));
 		if ((to_read & 0x80) == 0) {
 			return value;
 		}
@@ -157,8 +156,7 @@ unsigned long long get_var_long(binary_stream_t *stream) {
 
 long long get_signed_var_long(binary_stream_t *stream) {
 	unsigned long long raw = get_var_long(stream);
-	long long temp = (((raw << 63) >> 63) ^ raw) >> 1;
-	return temp ^ (raw & (((long long) 1) << ((long long) 63)));
+	return ((long long) (raw >> 1)) ^ (-1 * ((long long) (raw & 1)));
 }
 
 float get_float_le(binary_stream_t *stream) {
