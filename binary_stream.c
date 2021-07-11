@@ -236,6 +236,10 @@ void put_unsigned_byte(unsigned char value, binary_stream_t *stream) {
 	++stream->size;
 }
 
+void put_byte(char value, binary_stream_t *stream) {
+	put_unsigned_byte(value & 0xff, stream);
+}
+
 void put_unsigned_short_le(unsigned short value, binary_stream_t *stream) {
 	stream->buffer = realloc(stream->buffer, (stream->size + 2) * sizeof(char));
 	stream->buffer[stream->size] = value & 0xff;
@@ -251,6 +255,14 @@ void put_unsigned_short_be(unsigned short value, binary_stream_t *stream) {
 	++stream->size;
 	stream->buffer[stream->size] = value & 0xff;
 	++stream->size;
+}
+
+void put_short_le(short value, binary_stream_t *stream) {
+	put_unsigned_short_le(value & 0xffff, stream);
+}
+
+void put_short_be(short value, binary_stream_t *stream) {
+	put_unsigned_short_be(value & 0xffff, stream);
 }
 
 void put_unsigned_triad_le(unsigned int value, binary_stream_t *stream) {
@@ -298,6 +310,14 @@ void put_unsigned_int_be(unsigned int value, binary_stream_t *stream) {
 	++stream->size;
 }
 
+void put_int_le(int value, binary_stream_t *stream) {
+	put_unsigned_int_le(value & 0xffffffff, stream);
+}
+
+void put_int_be(int value, binary_stream_t *stream) {
+	put_unsigned_int_be(value & 0xffffffff, stream);
+}
+
 void put_unsigned_long_le(unsigned long long value, binary_stream_t *stream) {
 	stream->buffer = realloc(stream->buffer, (stream->size + 8) * sizeof(char));
 	stream->buffer[stream->size] = value & 0xff;
@@ -318,7 +338,6 @@ void put_unsigned_long_le(unsigned long long value, binary_stream_t *stream) {
 	++stream->size;
 }
 
-
 void put_unsigned_long_be(unsigned long long value, binary_stream_t *stream) {
 	stream->buffer = realloc(stream->buffer, (stream->size + 8) * sizeof(char));
 	stream->buffer[stream->size] = (value >> 56) & 0xff;
@@ -337,6 +356,14 @@ void put_unsigned_long_be(unsigned long long value, binary_stream_t *stream) {
 	++stream->size;
 	stream->buffer[stream->size] = value & 0xff;
 	++stream->size;
+}
+
+void put_long_le(long long value, binary_stream_t *stream) {
+	put_unsigned_long_le(value & 0xffffffffffffffff, stream);
+}
+
+void put_long_be(long long value, binary_stream_t *stream) {
+	put_unsigned_long_be(value & 0xffffffffffffffff, stream);
 }
 
 void put_var_int(unsigned int value, binary_stream_t *stream) {
@@ -361,6 +388,7 @@ void put_signed_var_int(int value, binary_stream_t *stream) {
 }
 
 void put_var_long(unsigned long long value, binary_stream_t *stream) {
+	value &= 0xffffffffffffffff;
 	for (int i = 0; i < 10; ++i) {
 		unsigned char to_write = value & 0x7f;
 		value >>= 7;
