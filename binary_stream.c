@@ -350,24 +350,24 @@ void put_signed_var_long(long int value, binary_stream_t *stream) {
 
 void put_float_le(float value, binary_stream_t *stream) {
 	unsigned int i;
-	memcpy(&value, &i, sizeof(i));
+	memcpy(&i, &value, sizeof(i));
 	put_unsigned_int_le(i, stream);
 }
 
 void put_float_be(float value, binary_stream_t *stream) {
 	unsigned int i;
-	memcpy(&value, &i, sizeof(i));
+	memcpy(&i, &value, sizeof(i));
 	put_unsigned_int_be(i, stream);
 }
 
 void put_double_le(double value, binary_stream_t *stream) {
-	unsigned long int i;
-	memcpy(&value, &i, sizeof(i));
-	put_unsigned_long_le(i, stream);
+	unsigned long int l;
+	memcpy(&l, &value, sizeof(l));
+	put_unsigned_long_le(l, stream);
 }
 
 void put_double_be(double value, binary_stream_t *stream) {
-	unsigned long int i;
-	memcpy(&value, &i, sizeof(i));
-	put_unsigned_long_be(i, stream);
+	unsigned long int l;
+	memcpy(&l, &value, sizeof(l));
+	put_unsigned_long_be(l, stream);
 }
