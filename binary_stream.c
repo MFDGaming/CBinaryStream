@@ -189,7 +189,7 @@ double get_double_be(binary_stream_t *stream) {
 }
 
 void put_bytes(char *data, int size, binary_stream_t *stream) {
-	for (int i = 0; i < size) {
+	for (int i = 0; i < size; ++i) {
 		stream->buffer = realloc(stream->buffer, (stream->size + 1) * sizeof(char));
 		stream->buffer[stream->size] = data[i];
 		++stream->size;
@@ -350,23 +350,23 @@ void put_signed_var_long(long int value, binary_stream_t *stream) {
 void put_float_le(float value, binary_stream_t *stream) {
 	unsigned int i;
 	memcpy(&value, &i, sizeof(i));
-	put_unsigned_int_le(i);
+	put_unsigned_int_le(i, stream);
 }
 
 void put_float_be(float value, binary_stream_t *stream) {
 	unsigned int i;
 	memcpy(&value, &i, sizeof(i));
-	put_unsigned_int_be(i);
+	put_unsigned_int_be(i, stream);
 }
 
 void put_double_le(double value, binary_stream_t *stream) {
 	unsigned long int i;
 	memcpy(&value, &i, sizeof(i));
-	put_unsigned_long_le(i);
+	put_unsigned_long_le(i, stream);
 }
 
 void put_double_be(double value, binary_stream_t *stream) {
 	unsigned long int i;
 	memcpy(&value, &i, sizeof(i));
-	put_unsigned_long_be(i);
+	put_unsigned_long_be(i, stream);
 }
