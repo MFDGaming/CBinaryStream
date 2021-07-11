@@ -64,7 +64,7 @@ unsigned int get_unsigned_triad_be(binary_stream_t *stream) {
 }
 
 unsigned int get_unsigned_int_le(binary_stream_t *stream) {
-	unsigned short value = stream->buffer[stream->offset] & 0xff;
+	unsigned int value = stream->buffer[stream->offset] & 0xff;
 	++stream->offset;
 	value |= (stream->buffer[stream->offset] & 0xff) << 8;
 	++stream->offset;
@@ -76,7 +76,7 @@ unsigned int get_unsigned_int_le(binary_stream_t *stream) {
 }
 
 unsigned int get_unsigned_int_be(binary_stream_t *stream) {
-	unsigned short value = (stream->buffer[stream->offset] & 0xff) << 24;
+	unsigned int value = (stream->buffer[stream->offset] & 0xff) << 24;
 	++stream->offset;
 	value |= (stream->buffer[stream->offset] & 0xff) << 16;
 	++stream->offset;
@@ -88,7 +88,7 @@ unsigned int get_unsigned_int_be(binary_stream_t *stream) {
 }
 
 unsigned long int get_unsigned_long_le(binary_stream_t *stream) {
-	unsigned short value = stream->buffer[stream->offset] & 0xff;
+	unsigned long int value = stream->buffer[stream->offset] & 0xff;
 	++stream->offset;
 	value |= (stream->buffer[stream->offset] & 0xff) << 8;
 	++stream->offset;
@@ -108,7 +108,7 @@ unsigned long int get_unsigned_long_le(binary_stream_t *stream) {
 }
 
 unsigned long int get_unsigned_long_be(binary_stream_t *stream) {
-	unsigned short value = (stream->buffer[stream->offset] & 0xff) << 56;
+	unsigned long int value = (stream->buffer[stream->offset] & 0xff) << 56;
 	++stream->offset;
 	value |= (stream->buffer[stream->offset] & 0xff) << 48;
 	++stream->offset;
