@@ -96,25 +96,25 @@ unsigned long int get_unsigned_long_le(binary_stream_t *stream) {
 	++stream->offset;
 	value |= (stream->buffer[stream->offset] & 0xff) << 24;
 	++stream->offset;
-	value |= (stream->buffer[stream->offset] & 0xff) << 32;
+	value |= (unsigned long int) (stream->buffer[stream->offset] & 0xff) << 32;
 	++stream->offset;
-	value |= (stream->buffer[stream->offset] & 0xff) << 40;
+	value |=  (unsigned long int) (stream->buffer[stream->offset] & 0xff) << 40;
 	++stream->offset;
-	value |= (stream->buffer[stream->offset] & 0xff) << 48;
+	value |= (unsigned long int) (stream->buffer[stream->offset] & 0xff) << 48;
 	++stream->offset;
-	value |= (stream->buffer[stream->offset] & 0xff) << 56;
+	value |= (unsigned long int) (stream->buffer[stream->offset] & 0xff) << 56;
 	++stream->offset;
 	return value;
 }
 
 unsigned long int get_unsigned_long_be(binary_stream_t *stream) {
-	unsigned long int value = (stream->buffer[stream->offset] & 0xff) << 56;
+	unsigned long int value = (unsigned long int) (stream->buffer[stream->offset] & 0xff) << 56;
 	++stream->offset;
-	value |= (stream->buffer[stream->offset] & 0xff) << 48;
+	value |= (unsigned long int) (stream->buffer[stream->offset] & 0xff) << 48;
 	++stream->offset;
-	value |= (stream->buffer[stream->offset] & 0xff) << 40;
+	value |= (unsigned long int) (stream->buffer[stream->offset] & 0xff) << 40;
 	++stream->offset;
-	value |= (stream->buffer[stream->offset] & 0xff) << 32;
+	value |= (unsigned long int) (stream->buffer[stream->offset] & 0xff) << 32;
 	++stream->offset;
 	value |= (stream->buffer[stream->offset] & 0xff) << 24;
 	++stream->offset;
@@ -158,7 +158,7 @@ unsigned long int get_var_long(binary_stream_t *stream) {
 long int get_signed_var_long(binary_stream_t *stream) {
 	unsigned long int raw = get_var_long(stream);
 	long int temp = (((raw << 63) >> 63) ^ raw) >> 1;
-	return temp ^ (raw & (1 << 63));
+	return temp ^ (raw & ((unsigned long int) 1 << 63));
 }
 
 float get_float_le(binary_stream_t *stream) {
