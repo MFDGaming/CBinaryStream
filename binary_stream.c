@@ -108,7 +108,7 @@ unsigned long long get_unsigned_long_le(binary_stream_t *stream) {
 }
 
 unsigned long long get_unsigned_long_be(binary_stream_t *stream) {
-	unsigned long long value = ((unsigned long long) (stream->buffer[stream->offset] & 0xff)) << ((unsigned long long) 56;
+	unsigned long long value = ((unsigned long long) (stream->buffer[stream->offset] & 0xff)) << ((unsigned long long) 56);
 	++stream->offset;
 	value |= ((unsigned long long) (stream->buffer[stream->offset] & 0xff)) << ((unsigned long long) 48);
 	++stream->offset;
