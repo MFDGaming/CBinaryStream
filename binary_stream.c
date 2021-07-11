@@ -27,6 +27,11 @@ unsigned char get_unsigned_byte(binary_stream_t *stream) {
 	return value;
 }
 
+char get_byte(binary_stream_t *stream) {
+	unsigned char raw = get_unsigned_byte(stream);
+	return *(char*)&raw;
+}
+
 unsigned short get_unsigned_short_le(binary_stream_t *stream) {
 	unsigned short value = stream->buffer[stream->offset] & 0xff;
 	++stream->offset;
@@ -41,6 +46,16 @@ unsigned short get_unsigned_short_be(binary_stream_t *stream) {
 	value |= stream->buffer[stream->offset] & 0xff;
 	++stream->offset;
 	return value;
+}
+
+short get_short_le(binary_stream_t *stream) {
+	unsigned short raw = get_unsigned_short_le(stream);
+	return *(short*)&raw;
+}
+
+short get_short_be(binary_stream_t *stream) {
+	unsigned short raw = get_unsigned_short_be(stream);
+	return *(short*)&raw;
 }
 
 unsigned int get_unsigned_triad_le(binary_stream_t *stream) {
@@ -87,6 +102,16 @@ unsigned int get_unsigned_int_be(binary_stream_t *stream) {
 	return value;
 }
 
+int get_int_le(binary_stream_t *stream) {
+	unsigned int raw = get_unsigned_int_le(stream);
+	return *(int*)&raw;
+}
+
+int get_int_be(binary_stream_t *stream) {
+	unsigned int raw = get_unsigned_int_be(stream);
+	return *(int*)&raw;
+}
+
 unsigned long long get_unsigned_long_le(binary_stream_t *stream) {
 	unsigned long long value = ((unsigned long long) (stream->buffer[stream->offset] & 0xff));
 	++stream->offset;
@@ -125,6 +150,16 @@ unsigned long long get_unsigned_long_be(binary_stream_t *stream) {
 	value |= ((unsigned long long) (stream->buffer[stream->offset] & 0xff));
 	++stream->offset;
 	return value;
+}
+
+long long get_long_le(binary_stream_t *stream) {
+	unsigned long long raw = get_unsigned_long_le(stream);
+	return *(long long*)&raw;
+}
+
+long long get_long_be(binary_stream_t *stream) {
+	unsigned long long raw = get_unsigned_long_be(stream);
+	return *(long long*)&raw;
 }
 
 unsigned int get_var_int(binary_stream_t *stream) {
