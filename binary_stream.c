@@ -6,6 +6,7 @@
 
 #include "binary_stream.h"
 #include <stdlib.h>
+#include <string.h>
 
 char *get_bytes(int count, binary_stream_t *stream) {
 	char *result = malloc(count * sizeof(char));
@@ -17,7 +18,7 @@ char *get_bytes(int count, binary_stream_t *stream) {
 }
 
 char *get_remaining_bytes(binary_stream_t *stream) {
-	return get(stream->size - stream->offset - 1, stream);
+	return get_bytes(stream->size - stream->offset - 1, stream);
 }
 
 unsigned char get_unsigned_byte(binary_stream_t *stream) {
@@ -43,7 +44,7 @@ unsigned short get_unsigned_short_be(binary_stream_t *stream) {
 }
 
 unsigned int get_unsigned_triad_le(binary_stream_t *stream) {
-	unsigned short value = stream->buffer[stream->offset] & 0xff;
+	unsigned int value = stream->buffer[stream->offset] & 0xff;
 	++stream->offset;
 	value |= (stream->buffer[stream->offset] & 0xff) << 8;
 	++stream->offset;
@@ -53,7 +54,7 @@ unsigned int get_unsigned_triad_le(binary_stream_t *stream) {
 }
 
 unsigned int get_unsigned_triad_be(binary_stream_t *stream) {
-	unsigned short value = (stream->buffer[stream->offset] & 0xff) << 16;
+	unsigned int value = (stream->buffer[stream->offset] & 0xff) << 16;
 	++stream->offset;
 	value |= (stream->buffer[stream->offset] & 0xff) << 8;
 	++stream->offset;
