@@ -265,7 +265,7 @@ void put_unsigned_int_be(unsigned int value, binary_stream_t *stream) {
 	++stream->size;
 }
 
-void put_unsigned_long_le(unsigned long int value, binary_stream_t *stream) {
+void put_unsigned_long_le(unsigned long long value, binary_stream_t *stream) {
 	stream->buffer = realloc(stream->buffer, (stream->size + 8) * sizeof(char));
 	stream->buffer[stream->size] = value & 0xff;
 	++stream->size;
@@ -286,7 +286,7 @@ void put_unsigned_long_le(unsigned long int value, binary_stream_t *stream) {
 }
 
 
-void put_unsigned_long_be(unsigned long int value, binary_stream_t *stream) {
+void put_unsigned_long_be(unsigned long long value, binary_stream_t *stream) {
 	stream->buffer = realloc(stream->buffer, (stream->size + 8) * sizeof(char));
 	stream->buffer[stream->size] = (value >> 56) & 0xff;
 	++stream->size;
