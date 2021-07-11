@@ -87,48 +87,48 @@ unsigned int get_unsigned_int_be(binary_stream_t *stream) {
 	return value;
 }
 
-unsigned long int get_unsigned_long_le(binary_stream_t *stream) {
-	unsigned long int value = stream->buffer[stream->offset] & 0xff;
+unsigned long long get_unsigned_long_le(binary_stream_t *stream) {
+	unsigned long long value = ((unsigned long long) (stream->buffer[stream->offset] & 0xff));
 	++stream->offset;
-	value |= (stream->buffer[stream->offset] & 0xff) << 8;
+	value |= ((unsigned long long) (stream->buffer[stream->offset] & 0xff)) << ((unsigned long long) 8);
 	++stream->offset;
-	value |= (stream->buffer[stream->offset] & 0xff) << 16;
+	value |= ((unsigned long long) (stream->buffer[stream->offset] & 0xff)) << ((unsigned long long) 16);
 	++stream->offset;
-	value |= (stream->buffer[stream->offset] & 0xff) << 24;
+	value |= ((unsigned long long) (stream->buffer[stream->offset] & 0xff)) << ((unsigned long long) 24);
 	++stream->offset;
-	value |= (unsigned long int) (stream->buffer[stream->offset] & 0xff) << 32;
+	value |= ((unsigned long long) (stream->buffer[stream->offset] & 0xff)) << ((unsigned long long) 32);
 	++stream->offset;
-	value |=  (unsigned long int) (stream->buffer[stream->offset] & 0xff) << 40;
+	value |= ((unsigned long long) (stream->buffer[stream->offset] & 0xff)) << ((unsigned long long) 40);
 	++stream->offset;
-	value |= (unsigned long int) (stream->buffer[stream->offset] & 0xff) << 48;
+	value |= ((unsigned long long) (stream->buffer[stream->offset] & 0xff)) << ((unsigned long long) 48);
 	++stream->offset;
-	value |= (unsigned long int) (stream->buffer[stream->offset] & 0xff) << 56;
+	value |= ((unsigned long long) (stream->buffer[stream->offset] & 0xff)) << ((unsigned long long) 56);
 	++stream->offset;
 	return value;
 }
 
-unsigned long int get_unsigned_long_be(binary_stream_t *stream) {
-	unsigned long int value = (unsigned long int) (stream->buffer[stream->offset] & 0xff) << 56;
+unsigned long long get_unsigned_long_be(binary_stream_t *stream) {
+	unsigned long long value = ((unsigned long long) (stream->buffer[stream->offset] & 0xff)) << ((unsigned long long) 56;
 	++stream->offset;
-	value |= (unsigned long int) (stream->buffer[stream->offset] & 0xff) << 48;
+	value |= ((unsigned long long) (stream->buffer[stream->offset] & 0xff)) << ((unsigned long long) 48);
 	++stream->offset;
-	value |= (unsigned long int) (stream->buffer[stream->offset] & 0xff) << 40;
+	value |= ((unsigned long long) (stream->buffer[stream->offset] & 0xff)) << ((unsigned long long) 40);
 	++stream->offset;
-	value |= (unsigned long int) (stream->buffer[stream->offset] & 0xff) << 32;
+	value |= ((unsigned long long) (stream->buffer[stream->offset] & 0xff)) << ((unsigned long long) 32);
 	++stream->offset;
-	value |= (stream->buffer[stream->offset] & 0xff) << 24;
+	value |= ((unsigned long long) (stream->buffer[stream->offset] & 0xff)) << ((unsigned long long) 24);
 	++stream->offset;
-	value |= (stream->buffer[stream->offset] & 0xff) << 16;
+	value |= ((unsigned long long) (stream->buffer[stream->offset] & 0xff)) << ((unsigned long long) 16);
 	++stream->offset;
-	value |= (stream->buffer[stream->offset] & 0xff) << 8;
+	value |= ((unsigned long long) (stream->buffer[stream->offset] & 0xff)) << ((unsigned long long) 8);
 	++stream->offset;
-	value |= stream->buffer[stream->offset] & 0xff;
+	value |= ((unsigned long long) (stream->buffer[stream->offset] & 0xff));
 	++stream->offset;
 	return value;
 }
 
 unsigned int get_var_int(binary_stream_t *stream) {
-	int value = 0;
+	unsigned int value = 0;
 	for (int i = 0; i < 35; i += 7) {
 		unsigned char to_read = get_unsigned_byte(stream);
 		value |= ((to_read & 0x7f) << i);
@@ -144,8 +144,8 @@ int get_signed_var_int(binary_stream_t *stream) {
 	return temp ^ (raw & (1 << 31));
 }
 
-unsigned long int get_var_long(binary_stream_t *stream) {
-	int value = 0;
+unsigned long long get_var_long(binary_stream_t *stream) {
+	unsigned long long value = 0;
 	for (int i = 0; i < 70; i += 7) {
 		unsigned char to_read = get_unsigned_byte(stream);
 		value |= ((to_read & 0x7f) << i);
@@ -155,10 +155,10 @@ unsigned long int get_var_long(binary_stream_t *stream) {
 	}
 }
 
-long int get_signed_var_long(binary_stream_t *stream) {
-	unsigned long int raw = get_var_long(stream);
-	long int temp = (((raw << 63) >> 63) ^ raw) >> 1;
-	return temp ^ (raw & ((unsigned long int) 1 << 63));
+long long get_signed_var_long(binary_stream_t *stream) {
+	unsigned long long raw = get_var_long(stream);
+	long long temp = (((raw << 63) >> 63) ^ raw) >> 1;
+	return temp ^ (raw & (((long long) 1) << ((long long) 63)));
 }
 
 float get_float_le(binary_stream_t *stream) {
@@ -176,14 +176,14 @@ float get_float_be(binary_stream_t *stream) {
 }
 
 double get_double_le(binary_stream_t *stream) {
-	unsigned long int l = get_unsigned_long_le(stream);
+	unsigned long long l = get_unsigned_long_le(stream);
 	double f;
 	memcpy(&f, &l, sizeof(f));
 	return f;
 }
 
 double get_double_be(binary_stream_t *stream) {
-	unsigned long int l = get_unsigned_long_be(stream);
+	unsigned long long l = get_unsigned_long_be(stream);
 	double f;
 	memcpy(&f, &l, sizeof(f));
 	return f;
@@ -327,7 +327,7 @@ void put_signed_var_int(int value, binary_stream_t *stream) {
 	put_var_int((value << 1) ^ (value >> 31), stream);
 }
 
-void put_var_long(unsigned long int value, binary_stream_t *stream) {
+void put_var_long(unsigned long long value, binary_stream_t *stream) {
 	for (int i = 0; i < 10; ++i) {
 		unsigned char to_write = value & 0x7f;
 		value >>= 7;
@@ -343,7 +343,7 @@ void put_var_long(unsigned long int value, binary_stream_t *stream) {
 	}
 }
 
-void put_signed_var_long(long int value, binary_stream_t *stream) {
+void put_signed_var_long(long long value, binary_stream_t *stream) {
 	put_var_long((value << 1) ^ (value >> 63), stream);
 }
 
@@ -360,13 +360,13 @@ void put_float_be(float value, binary_stream_t *stream) {
 }
 
 void put_double_le(double value, binary_stream_t *stream) {
-	unsigned long int l;
+	unsigned long long l;
 	memcpy(&l, &value, sizeof(l));
 	put_unsigned_long_le(l, stream);
 }
 
 void put_double_be(double value, binary_stream_t *stream) {
-	unsigned long int l;
+	unsigned long long l;
 	memcpy(&l, &value, sizeof(l));
 	put_unsigned_long_be(l, stream);
 }
