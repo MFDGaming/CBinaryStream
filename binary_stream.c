@@ -164,28 +164,28 @@ long int get_signed_var_long(binary_stream_t *stream) {
 float get_float_le(binary_stream_t *stream) {
 	unsigned int i = get_unsigned_int_le(stream);
 	float f;
-	memcpy(&i, &f, sizeof(f));
+	memcpy(&f, &i, sizeof(f));
 	return f;
 }
 
 float get_float_be(binary_stream_t *stream) {
 	unsigned int i = get_unsigned_int_be(stream);
 	float f;
-	memcpy(&i, &f, sizeof(f));
+	memcpy(&f, &i, sizeof(f));
 	return f;
 }
 
 double get_double_le(binary_stream_t *stream) {
 	unsigned long int l = get_unsigned_long_le(stream);
 	double f;
-	memcpy(&l, &f, sizeof(f));
+	memcpy(&f, &l, sizeof(f));
 	return f;
 }
 
 double get_double_be(binary_stream_t *stream) {
 	unsigned long int l = get_unsigned_long_be(stream);
 	double f;
-	memcpy(&l, &f, sizeof(f));
+	memcpy(&f, &l, sizeof(f));
 	return f;
 }
 
@@ -229,7 +229,6 @@ void put_unsigned_triad_le(unsigned int value, binary_stream_t *stream) {
 	stream->buffer[stream->size] = (value >> 16) & 0xff;
 	++stream->size;
 }
-
 
 void put_unsigned_triad_be(unsigned int value, binary_stream_t *stream) {
 	stream->buffer = realloc(stream->buffer, (stream->size + 3) * sizeof(char));
