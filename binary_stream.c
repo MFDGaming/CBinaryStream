@@ -313,7 +313,7 @@ void put_short_be(int16_t value, binary_stream_t *stream)
 	put_unsigned_short_be(value & 0xffff, stream);
 }
 
-void put_unsigned_triad_le(uint24_t value, binary_stream_t *stream)
+void put_unsigned_triad_le(uint32_t value, binary_stream_t *stream)
 {
 	stream->buffer = realloc(stream->buffer, (stream->size + 3) * sizeof(char));
 	stream->buffer[stream->size] = value & 0xff;
@@ -324,7 +324,7 @@ void put_unsigned_triad_le(uint24_t value, binary_stream_t *stream)
 	++stream->size;
 }
 
-void put_unsigned_triad_be(uint24_t value, binary_stream_t *stream)
+void put_unsigned_triad_be(uint32_t value, binary_stream_t *stream)
 {
 	stream->buffer = realloc(stream->buffer, (stream->size + 3) * sizeof(char));
 	stream->buffer[stream->size] = (value >> 16) & 0xff;
@@ -335,12 +335,12 @@ void put_unsigned_triad_be(uint24_t value, binary_stream_t *stream)
 	++stream->size;
 }
 
-void put_triad_le(int24_t value, binary_stream_t *stream)
+void put_triad_le(int32_t value, binary_stream_t *stream)
 {
 	put_unsigned_triad_le(value & 0xffffff, stream);
 }
 
-void put_triad_be(int24_t value, binary_stream_t *stream)
+void put_triad_be(int32_t value, binary_stream_t *stream)
 {
 	put_unsigned_triad_be(value & 0xffffff, stream);
 }
