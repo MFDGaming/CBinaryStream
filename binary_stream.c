@@ -67,9 +67,9 @@ int16_t get_short_be(binary_stream_t *stream)
 	return *(int16_t*)&raw;
 }
 
-uint24_t get_unsigned_triad_le(binary_stream_t *stream)
+uint32_t get_unsigned_triad_le(binary_stream_t *stream)
 {
-	uint24_t value = stream->buffer[stream->offset] & 0xff;
+	uint32_t value = stream->buffer[stream->offset] & 0xff;
 	++stream->offset;
 	value |= (stream->buffer[stream->offset] & 0xff) << 8;
 	++stream->offset;
@@ -78,9 +78,9 @@ uint24_t get_unsigned_triad_le(binary_stream_t *stream)
 	return value;
 }
 
-uint24_t get_unsigned_triad_be(binary_stream_t *stream)
+uint32_t get_unsigned_triad_be(binary_stream_t *stream)
 {
-	uint24_t value = (stream->buffer[stream->offset] & 0xff) << 16;
+	uint32_t value = (stream->buffer[stream->offset] & 0xff) << 16;
 	++stream->offset;
 	value |= (stream->buffer[stream->offset] & 0xff) << 8;
 	++stream->offset;
@@ -89,16 +89,16 @@ uint24_t get_unsigned_triad_be(binary_stream_t *stream)
 	return value;
 }
 
-int24_t get_triad_le(binary_stream_t *stream)
+int32_t get_triad_le(binary_stream_t *stream)
 {
-	uint24_t raw = get_unsigned_triad_le(stream);
-	return *(int24_t*)&raw;
+	uint32_t raw = get_unsigned_triad_le(stream);
+	return *(int32_t*)&raw;
 }
 
-int24_t get_triad_be(binary_stream_t *stream)
+int32_t get_triad_be(binary_stream_t *stream)
 {
-	uint24_t raw = get_unsigned_triad_be(stream);
-	return *(int24_t*)&raw;
+	uint32_t raw = get_unsigned_triad_be(stream);
+	return *(int32_t*)&raw;
 }
 
 uint32_t get_unsigned_int_le(binary_stream_t *stream)
