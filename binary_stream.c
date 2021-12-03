@@ -6,7 +6,6 @@
 
 #include "binary_stream.h"
 #include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
 
 char *get_bytes(int count, binary_stream_t *stream)
@@ -208,12 +207,14 @@ uint32_t get_var_int(binary_stream_t *stream)
 	return 0;
 }
 
-int32_t get_signed_var_int(binary_stream_t *stream) {
+int32_t get_signed_var_int(binary_stream_t *stream)
+{
 	uint32_t raw = get_var_int(stream);
 	return (raw >> 1) ^ (-1 * (raw & 1));
 }
 
-uint64_t get_var_long(binary_stream_t *stream) {
+uint64_t get_var_long(binary_stream_t *stream)
+{
 	uint64_t value = 0;
 	for (int i = 0; i < 70; i += 7) {
 		uint8_t to_read = get_unsigned_byte(stream);
@@ -225,33 +226,38 @@ uint64_t get_var_long(binary_stream_t *stream) {
 	return 0;
 }
 
-int64_t get_signed_var_long(binary_stream_t *stream) {
+int64_t get_signed_var_long(binary_stream_t *stream)
+{
 	uint64_t raw = get_var_long(stream);
 	return ((int64_t) (raw >> 1)) ^ (-1 * ((int64_t) (raw & 1)));
 }
 
-float get_float_le(binary_stream_t *stream) {
+float get_float_le(binary_stream_t *stream)
+{
 	uint32_t i = get_unsigned_int_le(stream);
 	float f;
 	memcpy(&f, &i, sizeof(f));
 	return f;
 }
 
-float get_float_be(binary_stream_t *stream) {
+float get_float_be(binary_stream_t *stream)
+{
 	uint32_t i = get_unsigned_int_be(stream);
 	float f;
 	memcpy(&f, &i, sizeof(f));
 	return f;
 }
 
-double get_double_le(binary_stream_t *stream) {
+double get_double_le(binary_stream_t *stream)
+{
 	uint64_t l = get_unsigned_long_le(stream);
 	double f;
 	memcpy(&f, &l, sizeof(f));
 	return f;
 }
 
-double get_double_be(binary_stream_t *stream) {
+double get_double_be(binary_stream_t *stream)
+{
 	uint64_t l = get_unsigned_long_be(stream);
 	double f;
 	memcpy(&f, &l, sizeof(f));
@@ -351,7 +357,6 @@ void put_unsigned_int_le(uint32_t value, binary_stream_t *stream)
 	stream->buffer[stream->size] = (value >> 24) & 0xff;
 	++stream->size;
 }
-
 
 void put_unsigned_int_be(uint32_t value, binary_stream_t *stream)
 {
