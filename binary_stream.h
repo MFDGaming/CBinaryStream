@@ -35,9 +35,9 @@ uint32_t get_unsigned_triad_le(binary_stream_t *stream);
 
 uint32_t get_unsigned_triad_be(binary_stream_t *stream);
 
-int24_t get_triad_le(binary_stream_t *stream);
+int32_t get_triad_le(binary_stream_t *stream);
 
-int24_t get_triad_be(binary_stream_t *stream);
+int32_t get_triad_be(binary_stream_t *stream);
 
 uint32_t get_unsigned_int_le(binary_stream_t *stream);
 
@@ -89,9 +89,9 @@ void put_unsigned_triad_le(uint32_t value, binary_stream_t *stream);
 
 void put_unsigned_triad_be(uint32_t value, binary_stream_t *stream);
 
-void put_triad_le(int24_t value, binary_stream_t *stream);
+void put_triad_le(int32_t value, binary_stream_t *stream);
 
-void put_triad_be(int24_t value, binary_stream_t *stream);
+void put_triad_be(int32_t value, binary_stream_t *stream);
 
 void put_unsigned_int_le(uint32_t value, binary_stream_t *stream);
 
