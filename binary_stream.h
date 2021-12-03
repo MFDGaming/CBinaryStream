@@ -7,6 +7,8 @@
 #ifndef BINARY_STREAM_H
 #define BINARY_STREAM_H
 
+#include <stdint.h>
+
 typedef struct {
 	char *buffer;
 	int size;
