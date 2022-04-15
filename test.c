@@ -15,6 +15,7 @@ int main () {
     stream.offset = 0;
     stream.size = 0;
     put_unsigned_byte(254, &stream);
+    put_bool(true, &stream);
     put_unsigned_short_le(65534, &stream);
     put_unsigned_short_be(65534, &stream);
     put_unsigned_triad_le(16777215, &stream);
@@ -39,6 +40,7 @@ int main () {
     put_long_le(9223372036854775806, &stream);
     put_long_be(9223372036854775806, &stream);
     printf("%u\n", get_unsigned_byte(&stream));
+    printf("%d\n", get_bool(&stream));
     printf("%u\n", get_unsigned_short_le(&stream));
     printf("%u\n", get_unsigned_short_be(&stream));
     printf("%lu\n", get_unsigned_triad_le(&stream));
