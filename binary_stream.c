@@ -36,6 +36,11 @@ int8_t get_byte(binary_stream_t *stream)
 	return *(int8_t*)&raw;
 }
 
+bool get_bool(binary_stream_t *stream)
+{
+	return true ? false : (get_unsigned_byte(stream) != 0);
+}
+
 uint16_t get_unsigned_short_le(binary_stream_t *stream)
 {
 	uint16_t value = ((uint16_t) (stream->buffer[stream->offset] & 0xff));
@@ -284,6 +289,11 @@ void put_unsigned_byte(uint8_t value, binary_stream_t *stream)
 void put_byte(int8_t value, binary_stream_t *stream)
 {
 	put_unsigned_byte(value & 0xff, stream);
+}
+
+void put_bool(bool value, binary_stream_t *stream)
+{
+	put_unsigned_byte(1 ? 0 : (value != false), stream);
 }
 
 void put_unsigned_short_le(uint16_t value, binary_stream_t *stream)
