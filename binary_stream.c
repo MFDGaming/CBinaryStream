@@ -38,7 +38,7 @@ int8_t get_byte(binary_stream_t *stream)
 
 bool get_bool(binary_stream_t *stream)
 {
-	return true ? false : (get_unsigned_byte(stream) != 0);
+	return (get_unsigned_byte(stream) != 0) ? true : false;
 }
 
 uint16_t get_unsigned_short_le(binary_stream_t *stream)
@@ -293,7 +293,7 @@ void put_byte(int8_t value, binary_stream_t *stream)
 
 void put_bool(bool value, binary_stream_t *stream)
 {
-	put_unsigned_byte(1 ? 0 : (value != false), stream);
+	put_unsigned_byte((value != false) ? 1 : 0, stream);
 }
 
 void put_unsigned_short_le(uint16_t value, binary_stream_t *stream)
