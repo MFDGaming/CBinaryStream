@@ -7,6 +7,7 @@
 #ifndef BINARY_STREAM_H
 #define BINARY_STREAM_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -23,6 +24,8 @@ int8_t *get_remaining_bytes(binary_stream_t *stream);
 uint8_t get_unsigned_byte(binary_stream_t *stream);
 
 int8_t get_byte(binary_stream_t *stream);
+
+bool get_bool(binary_stream_t *stream);
 
 uint16_t get_unsigned_short_le(binary_stream_t *stream);
 
@@ -77,6 +80,8 @@ void put_bytes(int8_t *data, size_t size, binary_stream_t *stream);
 void put_unsigned_byte(uint8_t value, binary_stream_t *stream);
 
 void put_byte(int8_t value, binary_stream_t *stream);
+
+void put_bool(bool value, binary_stream_t *stream);
 
 void put_unsigned_short_le(uint16_t value, binary_stream_t *stream);
 
