@@ -1,7 +1,7 @@
 /*
    Copyright Alexander Argentakis
    Repo: https://github.com/MFDGaming/CBinaryStream
-   This file is licensed under the GPL v2.0 license
+   This file is licensed under the MIT license
  */
 
 #ifndef BINARY_STREAM_H
