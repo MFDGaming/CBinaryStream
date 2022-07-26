@@ -17,6 +17,10 @@ typedef struct {
 	size_t offset;
 } binary_stream_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int8_t *get_bytes(size_t count, binary_stream_t *stream);
 
 int8_t *get_remaining_bytes(binary_stream_t *stream);
@@ -131,4 +135,8 @@ void put_double_le(double value, binary_stream_t *stream);
 
 void put_double_be(double value, binary_stream_t *stream);
 
+#ifdef __cplusplus
+}
+#endif
+	
 #endif
