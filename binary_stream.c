@@ -7,6 +7,10 @@
 #include "binary_stream.h"
 #include <string.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int8_t *get_bytes(size_t count, binary_stream_t *stream)
 {
 	int8_t *result = (int8_t *) malloc(count);
@@ -519,3 +523,7 @@ void put_double_be(double value, binary_stream_t *stream)
 	memcpy(&l, &value, sizeof(l));
 	put_unsigned_long_be(l, stream);
 }
+
+#ifdef __cplusplus
+}
+#endif
