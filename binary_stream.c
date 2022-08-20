@@ -4,524 +4,447 @@
    This file is licensed under the MIT license
  */
 
-#include "binary_stream.h"
+#include <stdbool.h>
 #include <string.h>
+#include "./binary_stream.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int8_t *get_bytes(size_t count, binary_stream_t *stream)
+bool binary_stream_read(binary_stream_t *stream, size_t size, uint8_t **output)
 {
-	int8_t *result = (int8_t *) malloc(count);
-	size_t i;
-	for (i = 0; i < count; ++i) {
-		result[i] = stream->buffer[stream->offset];
-		++stream->offset;
-	}
-	return result;
+    if ((stream->offset + size) <= stream->size) {
+        *output = stream->buffer + stream->offset;
+        stream->offset += size;
+	return true;
+    }
+    return false;
 }
 
-int8_t *get_remaining_bytes(binary_stream_t *stream)
+void binary_stream_write(binary_stream_t *stream, uint8_t *buffer, size_t size)
 {
-	return get_bytes(stream->size - stream->offset, stream);
+    size_t old_size = stream->size;
+    stream->size += size;
+    stream->buffer = (uint8_t *) realloc(stream->buffer, stream->size);
+    memcpy(stream->buffer + old_size, buffer, size);
 }
 
-uint8_t get_unsigned_byte(binary_stream_t *stream)
+bool binary_stream_read_u8(binary_stream_t *stream, uint8_t *output)
 {
-	uint8_t value = ((uint8_t) (stream->buffer[stream->offset] & 0xff));
-	++stream->offset;
-	return value;
+    uint8_t *out;
+    bool has_error = binary_stream_read(stream, 1, &out);
+    if (has_error)
+        *output = out[0];
+    return has_error;
 }
 
-int8_t get_byte(binary_stream_t *stream)
+void binary_stream_write_u8(binary_stream_t *stream, uint8_t input)
 {
-	uint8_t raw = get_unsigned_byte(stream);
-	return *(int8_t*)&raw;
+    binary_stream_write(stream, &input, 1);
 }
 
-bool get_bool(binary_stream_t *stream)
+bool binary_stream_read_i8(binary_stream_t *stream, int8_t *output)
 {
-	return (get_unsigned_byte(stream) != 0) ? true : false;
+    return binary_stream_read_u8(stream, (uint8_t *) output);
 }
 
-uint16_t get_unsigned_short_le(binary_stream_t *stream)
+void binary_stream_write_i8(binary_stream_t *stream, int8_t input)
 {
-	uint16_t value = ((uint16_t) (stream->buffer[stream->offset] & 0xff));
-	++stream->offset;
-	value |= ((uint16_t) (stream->buffer[stream->offset] & 0xff)) << 8;
-	++stream->offset;
-	return value;
+    binary_stream_write_u8(stream, *((uint8_t *) &input));
 }
 
-uint16_t get_unsigned_short_be(binary_stream_t *stream)
+bool binary_stream_read_u16le(binary_stream_t *stream, uint16_t *output)
 {
-	uint16_t value = ((uint16_t) (stream->buffer[stream->offset] & 0xff)) << 8;
-	++stream->offset;
-	value |= ((uint16_t) (stream->buffer[stream->offset] & 0xff));
-	++stream->offset;
-	return value;
+    uint8_t *out;
+    bool has_error = binary_stream_read(stream, 2, &out);
+    if (has_error)
+        *output = ((uint16_t) out[0]) | (((uint16_t) out[1]) << 8);
+    return has_error;
 }
 
-int16_t get_short_le(binary_stream_t *stream)
+void binary_stream_write_u16le(binary_stream_t *stream, uint16_t input)
 {
-	uint16_t raw = get_unsigned_short_le(stream);
-	return *(int16_t*)&raw;
+    uint8_t byte_array[] = {
+        (uint8_t) (input & 0xff),
+        (uint8_t) ((input >> 8) & 0xff)
+    };
+    binary_stream_write(stream, byte_array, 2);
 }
 
-int16_t get_short_be(binary_stream_t *stream)
+bool binary_stream_read_i16le(binary_stream_t *stream, int16_t *output)
 {
-	uint16_t raw = get_unsigned_short_be(stream);
-	return *(int16_t*)&raw;
+    return binary_stream_read_u16le(stream, (uint16_t *) output);
 }
 
-uint32_t get_unsigned_triad_le(binary_stream_t *stream)
+void binary_stream_write_i16le(binary_stream_t *stream, int16_t input)
 {
-	uint32_t value = ((uint32_t) stream->buffer[stream->offset] & 0xff);
-	++stream->offset;
-	value |= ((uint32_t) (stream->buffer[stream->offset] & 0xff)) << 8;
-	++stream->offset;
-	value |= ((uint32_t) (stream->buffer[stream->offset] & 0xff)) << 16;
-	++stream->offset;
-	return value;
+    binary_stream_write_u16le(stream, *((uint16_t *) &input));
 }
 
-uint32_t get_unsigned_triad_be(binary_stream_t *stream)
+bool binary_stream_read_u16be(binary_stream_t *stream, uint16_t *output)
 {
-	uint32_t value = ((uint32_t) (stream->buffer[stream->offset] & 0xff)) << 16;
-	++stream->offset;
-	value |= ((uint32_t) (stream->buffer[stream->offset] & 0xff)) << 8;
-	++stream->offset;
-	value |= ((uint32_t) stream->buffer[stream->offset] & 0xff);
-	++stream->offset;
-	return value;
+    uint8_t *out;
+    bool has_error = binary_stream_read(stream, 2, &out);
+    if (has_error)
+        *output =  (((uint16_t) out[0]) << 8) | ((uint16_t) out[1]);
+    return has_error;
 }
 
-int32_t get_triad_le(binary_stream_t *stream)
+void binary_stream_write_u16be(binary_stream_t *stream, uint16_t input)
 {
-	uint32_t raw = get_unsigned_triad_le(stream);
-	return *(int32_t*)&raw;
+    uint8_t byte_array[] = {
+        (uint8_t) ((input >> 8) & 0xff),
+        (uint8_t) (input & 0xff)
+    };
+    binary_stream_write(stream, byte_array, 2);
 }
 
-int32_t get_triad_be(binary_stream_t *stream)
+bool binary_stream_read_i16be(binary_stream_t *stream, int16_t *output)
 {
-	uint32_t raw = get_unsigned_triad_be(stream);
-	return *(int32_t*)&raw;
+    return binary_stream_read_u16be(stream, (uint16_t *) output);
 }
 
-uint32_t get_unsigned_int_le(binary_stream_t *stream)
+void binary_stream_write_i16be(binary_stream_t *stream, int16_t input)
 {
-	uint32_t value = ((uint32_t) (stream->buffer[stream->offset] & 0xff));
-	++stream->offset;
-	value |= ((uint32_t) (stream->buffer[stream->offset] & 0xff)) << 8;
-	++stream->offset;
-	value |= ((uint32_t) (stream->buffer[stream->offset] & 0xff)) << 16;
-	++stream->offset;
-	value |= ((uint32_t) (stream->buffer[stream->offset] & 0xff)) << 24;
-	++stream->offset;
-	return value;
+    binary_stream_write_u16be(stream, *((uint16_t *) &input));
 }
 
-uint32_t get_unsigned_int_be(binary_stream_t *stream)
+bool binary_stream_read_u24le(binary_stream_t *stream, uint32_t *output)
 {
-	uint32_t value = ((uint32_t) (stream->buffer[stream->offset] & 0xff)) << 24;
-	++stream->offset;
-	value |= ((uint32_t) (stream->buffer[stream->offset] & 0xff)) << 16;
-	++stream->offset;
-	value |= ((uint32_t) (stream->buffer[stream->offset] & 0xff)) << 8;
-	++stream->offset;
-	value |= ((uint32_t) (stream->buffer[stream->offset] & 0xff));
-	++stream->offset;
-	return value;
+    uint8_t *out;
+    bool has_error = binary_stream_read(stream, 3, &out);
+    if (has_error)
+        *output = ((uint32_t) out[0]) | (((uint32_t) out[1]) << 8) | (((uint32_t) out[2]) << 16);
+    return has_error;
 }
 
-int32_t get_int_le(binary_stream_t *stream)
+void binary_stream_write_u24le(binary_stream_t *stream, uint32_t input)
 {
-	uint32_t raw = get_unsigned_int_le(stream);
-	return *(int32_t*)&raw;
+    uint8_t byte_array[] = {
+        (uint8_t) (input & 0xff),
+        (uint8_t) ((input >> 8) & 0xff),
+        (uint8_t) ((input >> 16) & 0xff)
+    };
+    binary_stream_write(stream, byte_array, 3);
 }
 
-int32_t get_int_be(binary_stream_t *stream)
+bool binary_stream_read_u24be(binary_stream_t *stream, uint32_t *output)
 {
-	uint32_t raw = get_unsigned_int_be(stream);
-	return *(int32_t*)&raw;
+    uint8_t *out;
+    bool has_error = binary_stream_read(stream, 3, &out);
+    if (has_error)
+        *output = (((uint32_t) out[0]) << 16) | (((uint32_t) out[1]) << 8) | ((uint32_t) out[2]);
+    return has_error;
 }
 
-uint64_t get_unsigned_long_le(binary_stream_t *stream)
+void binary_stream_write_u24be(binary_stream_t *stream, uint32_t input)
 {
-	uint64_t value = ((uint64_t) (stream->buffer[stream->offset] & 0xff));
-	++stream->offset;
-	value |= ((uint64_t) (stream->buffer[stream->offset] & 0xff)) << ((uint64_t) 8);
-	++stream->offset;
-	value |= ((uint64_t) (stream->buffer[stream->offset] & 0xff)) << ((uint64_t) 16);
-	++stream->offset;
-	value |= ((uint64_t) (stream->buffer[stream->offset] & 0xff)) << ((uint64_t) 24);
-	++stream->offset;
-	value |= ((uint64_t) (stream->buffer[stream->offset] & 0xff)) << ((uint64_t) 32);
-	++stream->offset;
-	value |= ((uint64_t) (stream->buffer[stream->offset] & 0xff)) << ((uint64_t) 40);
-	++stream->offset;
-	value |= ((uint64_t) (stream->buffer[stream->offset] & 0xff)) << ((uint64_t) 48);
-	++stream->offset;
-	value |= ((uint64_t) (stream->buffer[stream->offset] & 0xff)) << ((uint64_t) 56);
-	++stream->offset;
-	return value;
+    uint8_t byte_array[] = {
+        (uint8_t) ((input >> 16) & 0xff),
+        (uint8_t) ((input >> 8) & 0xff),
+        (uint8_t) (input & 0xff)
+    };
+    binary_stream_write(stream, byte_array, 3);
 }
 
-uint64_t get_unsigned_long_be(binary_stream_t *stream)
+bool binary_stream_read_u32le(binary_stream_t *stream, uint32_t *output)
 {
-	uint64_t value = ((uint64_t) (stream->buffer[stream->offset] & 0xff)) << ((uint64_t) 56);
-	++stream->offset;
-	value |= ((uint64_t) (stream->buffer[stream->offset] & 0xff)) << ((uint64_t) 48);
-	++stream->offset;
-	value |= ((uint64_t) (stream->buffer[stream->offset] & 0xff)) << ((uint64_t) 40);
-	++stream->offset;
-	value |= ((uint64_t) (stream->buffer[stream->offset] & 0xff)) << ((uint64_t) 32);
-	++stream->offset;
-	value |= ((uint64_t) (stream->buffer[stream->offset] & 0xff)) << ((uint64_t) 24);
-	++stream->offset;
-	value |= ((uint64_t) (stream->buffer[stream->offset] & 0xff)) << ((uint64_t) 16);
-	++stream->offset;
-	value |= ((uint64_t) (stream->buffer[stream->offset] & 0xff)) << ((uint64_t) 8);
-	++stream->offset;
-	value |= ((uint64_t) (stream->buffer[stream->offset] & 0xff));
-	++stream->offset;
-	return value;
+    uint8_t *out;
+    bool has_error = binary_stream_read(stream, 4, &out);
+    if (has_error)
+        *output = ((uint32_t) out[0]) | (((uint32_t) out[1]) << 8) | (((uint32_t) out[2]) << 16) | (((uint32_t) out[3]) << 24);
+    return has_error;
 }
 
-int64_t get_long_le(binary_stream_t *stream)
+void binary_stream_write_u32le(binary_stream_t *stream, uint32_t input)
 {
-	uint64_t raw = get_unsigned_long_le(stream);
-	return *(int64_t*)&raw;
+    uint8_t byte_array[] = {
+        (uint8_t) (input & 0xff),
+        (uint8_t) ((input >> 8) & 0xff),
+        (uint8_t) ((input >> 16) & 0xff),
+        (uint8_t) ((input >> 24) & 0xff)
+    };
+    binary_stream_write(stream, byte_array, 4);
 }
 
-int64_t get_long_be(binary_stream_t *stream)
+bool binary_stream_read_i32le(binary_stream_t *stream, int32_t *output)
 {
-	uint64_t raw = get_unsigned_long_be(stream);
-	return *(int64_t*)&raw;
+    return binary_stream_read_u32le(stream, (uint32_t *) output);
 }
 
-uint32_t get_var_int(binary_stream_t *stream)
+void binary_stream_write_i32le(binary_stream_t *stream, int32_t input)
 {
-	uint32_t value = 0;
-	int i;
-	for (i = 0; i < 35; i += 7) {
-		uint8_t to_read = get_unsigned_byte(stream);
-		value |= ((to_read & 0x7f) << i);
-		if ((to_read & 0x80) == 0) {
-			return value;
-		}
-	}
-	return 0;
+    binary_stream_write_u32le(stream, *((uint32_t *) &input));
 }
 
-int32_t get_signed_var_int(binary_stream_t *stream)
+bool binary_stream_read_u32be(binary_stream_t *stream, uint32_t *output)
 {
-	uint32_t raw = get_var_int(stream);
-	return (raw >> 1) ^ (-1 * (raw & 1));
+    uint8_t *out;
+    bool has_error = binary_stream_read(stream, 4, &out);
+    if (has_error)
+        *output = (((uint32_t) out[0]) << 24) | (((uint32_t) out[1]) << 16) | (((uint32_t) out[2]) << 8) | ((uint32_t) out[3]);
+    return has_error;
 }
 
-uint64_t get_var_long(binary_stream_t *stream)
+void binary_stream_write_u32be(binary_stream_t *stream, uint32_t input)
 {
-	uint64_t value = 0;
-	int i;
-	for (i = 0; i < 70; i += 7) {
-		uint8_t to_read = get_unsigned_byte(stream);
-		value |= (((uint64_t) (to_read & 0x7f)) << ((uint64_t) i));
-		if ((to_read & 0x80) == 0) {
-			return value;
-		}
-	}
-	return 0;
+    uint8_t byte_array[] = {
+        (uint8_t) ((input >> 24) & 0xff),
+        (uint8_t) ((input >> 16) & 0xff),
+        (uint8_t) ((input >> 8) & 0xff),
+        (uint8_t) (input & 0xff)
+    };
+    binary_stream_write(stream, byte_array, 4);
 }
 
-int64_t get_signed_var_long(binary_stream_t *stream)
+bool binary_stream_read_i32be(binary_stream_t *stream, int32_t *output)
 {
-	uint64_t raw = get_var_long(stream);
-	return ((int64_t) (raw >> 1)) ^ (-1 * ((int64_t) (raw & 1)));
+    return binary_stream_read_u32be(stream, (uint32_t *) output);
 }
 
-float get_float_le(binary_stream_t *stream)
+void binary_stream_write_i32be(binary_stream_t *stream, int32_t input)
 {
-	uint32_t i = get_unsigned_int_le(stream);
-	float f;
-	memcpy(&f, &i, sizeof(f));
-	return f;
+    binary_stream_write_u32be(stream, *((uint32_t *) &input));
 }
 
-float get_float_be(binary_stream_t *stream)
+bool binary_stream_read_u64le(binary_stream_t *stream, uint64_t *output)
 {
-	uint32_t i = get_unsigned_int_be(stream);
-	float f;
-	memcpy(&f, &i, sizeof(f));
-	return f;
+    uint8_t *out;
+    bool has_error = binary_stream_read(stream, 8, &out);
+    if (has_error)
+        *output = ((uint64_t) out[0]) | (((uint64_t) out[1]) << 8) | (((uint64_t) out[2]) << 16) | (((uint64_t) out[3]) << 24) | (((uint64_t) out[4]) << 32) | (((uint64_t) out[5]) << 40) | (((uint64_t) out[6]) << 48) | (((uint64_t) out[7]) << 56);
+    return has_error;
 }
 
-double get_double_le(binary_stream_t *stream)
+void binary_stream_write_u64le(binary_stream_t *stream, uint64_t input)
 {
-	uint64_t l = get_unsigned_long_le(stream);
-	double f;
-	memcpy(&f, &l, sizeof(f));
-	return f;
+    uint8_t byte_array[] = {
+        (uint8_t) (input & 0xff),
+        (uint8_t) ((input >> 8) & 0xff),
+        (uint8_t) ((input >> 16) & 0xff),
+        (uint8_t) ((input >> 24) & 0xff),
+        (uint8_t) ((input >> 32) & 0xff),
+        (uint8_t) ((input >> 40) & 0xff),
+        (uint8_t) ((input >> 48) & 0xff),
+        (uint8_t) ((input >> 56) & 0xff)
+    };
+    binary_stream_write(stream, byte_array, 8);
 }
 
-double get_double_be(binary_stream_t *stream)
+bool binary_stream_read_i64le(binary_stream_t *stream, int64_t *output)
 {
-	uint64_t l = get_unsigned_long_be(stream);
-	double f;
-	memcpy(&f, &l, sizeof(f));
-	return f;
+    return binary_stream_read_u64le(stream, (uint64_t *) output);
 }
 
-void put_bytes(int8_t *data, size_t size, binary_stream_t *stream)
+void binary_stream_write_i64le(binary_stream_t *stream, int64_t input)
 {
-	size_t i;
-	stream->buffer = (int8_t *) realloc(stream->buffer, stream->size + size);
-	for (i = 0; i < size; ++i) {
-		stream->buffer[stream->size] = data[i];
-		++stream->size;
-	}
+    binary_stream_write_u64le(stream, *((uint64_t *) &input));
 }
 
-void put_unsigned_byte(uint8_t value, binary_stream_t *stream)
+bool binary_stream_read_u64be(binary_stream_t *stream, uint64_t *output)
 {
-	stream->buffer = (int8_t *) realloc(stream->buffer, stream->size + 1);
-	stream->buffer[stream->size] = value & 0xff;
-	++stream->size;
+    uint8_t *out;
+    bool has_error = binary_stream_read(stream, 8, &out);
+    if (has_error)
+        *output = (((uint64_t) out[0]) << 56) | (((uint64_t) out[1]) << 48) | (((uint64_t) out[2]) << 40) | (((uint64_t) out[3]) << 32) | (((uint64_t) out[4]) << 24) | (((uint64_t) out[5]) << 16) | (((uint64_t) out[6]) << 8) | ((uint64_t) out[7]);
+    return has_error;
 }
 
-void put_byte(int8_t value, binary_stream_t *stream)
+void binary_stream_write_u64be(binary_stream_t *stream, uint64_t input)
 {
-	put_unsigned_byte(value & 0xff, stream);
+    uint8_t byte_array[] = {
+        (uint8_t) ((input >> 56) & 0xff),
+        (uint8_t) ((input >> 48) & 0xff),
+        (uint8_t) ((input >> 40) & 0xff),
+        (uint8_t) ((input >> 32) & 0xff),
+        (uint8_t) ((input >> 24) & 0xff),
+        (uint8_t) ((input >> 16) & 0xff),
+        (uint8_t) ((input >> 8) & 0xff),
+        (uint8_t) (input & 0xff)
+    };
+    binary_stream_write(stream, byte_array, 8);
 }
 
-void put_bool(bool value, binary_stream_t *stream)
+bool binary_stream_read_i64be(binary_stream_t *stream, int64_t *output)
 {
-	put_unsigned_byte((value != false) ? 1 : 0, stream);
+    return binary_stream_read_u64be(stream, (uint64_t *) output);
 }
 
-void put_unsigned_short_le(uint16_t value, binary_stream_t *stream)
+void binary_stream_write_i64be(binary_stream_t *stream, int64_t input)
 {
-	stream->buffer = (int8_t *) realloc(stream->buffer, stream->size + 2);
-	stream->buffer[stream->size] = value & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 8) & 0xff;
-	++stream->size;
+    binary_stream_write_u64be(stream, *((uint64_t *) &input));
 }
 
-void put_unsigned_short_be(uint16_t value, binary_stream_t *stream)
+bool binary_stream_read_f32le(binary_stream_t *stream, float *output)
 {
-	stream->buffer = (int8_t *) realloc(stream->buffer, stream->size + 2);
-	stream->buffer[stream->size] = (value >> 8) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = value & 0xff;
-	++stream->size;
+    return binary_stream_read_u32le(stream, (uint32_t *) output);
 }
 
-void put_short_le(int16_t value, binary_stream_t *stream)
+void binary_stream_write_f32le(binary_stream_t *stream, float input)
 {
-	put_unsigned_short_le(value & 0xffff, stream);
+    binary_stream_write_u32le(stream, *((uint32_t *) &input));
 }
 
-void put_short_be(int16_t value, binary_stream_t *stream)
+bool binary_stream_read_f32be(binary_stream_t *stream, float *output)
 {
-	put_unsigned_short_be(value & 0xffff, stream);
+    return binary_stream_read_u32be(stream, (uint32_t *) output);
 }
 
-void put_unsigned_triad_le(uint32_t value, binary_stream_t *stream)
+void binary_stream_write_f32be(binary_stream_t *stream, float input)
 {
-	stream->buffer = (int8_t *) realloc(stream->buffer, stream->size + 3);
-	stream->buffer[stream->size] = value & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 8) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 16) & 0xff;
-	++stream->size;
+    binary_stream_write_u32be(stream, *((uint32_t *) &input));
 }
 
-void put_unsigned_triad_be(uint32_t value, binary_stream_t *stream)
+bool binary_stream_read_f64le(binary_stream_t *stream, double *output)
 {
-	stream->buffer = (int8_t *) realloc(stream->buffer, stream->size + 3);
-	stream->buffer[stream->size] = (value >> 16) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 8) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = value & 0xff;
-	++stream->size;
+    return binary_stream_read_u64le(stream, (uint64_t *) output);
 }
 
-void put_triad_le(int32_t value, binary_stream_t *stream)
+void binary_stream_write_f64le(binary_stream_t *stream, double input)
 {
-	put_unsigned_triad_le(value & 0xffffff, stream);
+    binary_stream_write_u64le(stream, *((uint64_t *) &input));
 }
 
-void put_triad_be(int32_t value, binary_stream_t *stream)
+bool binary_stream_read_f64be(binary_stream_t *stream, double *output)
 {
-	put_unsigned_triad_be(value & 0xffffff, stream);
+    return binary_stream_read_u64be(stream, (uint64_t *) output);
 }
 
-void put_unsigned_int_le(uint32_t value, binary_stream_t *stream)
+void binary_stream_write_f64be(binary_stream_t *stream, double input)
 {
-	stream->buffer = (int8_t *) realloc(stream->buffer, stream->size + 4);
-	stream->buffer[stream->size] = value & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 8) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 16) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 24) & 0xff;
-	++stream->size;
+    binary_stream_write_u64be(stream, *((uint64_t *) &input));
 }
 
-void put_unsigned_int_be(uint32_t value, binary_stream_t *stream)
+bool binary_stream_read_bool(binary_stream_t *stream, bool *output)
 {
-	stream->buffer = (int8_t *) realloc(stream->buffer, stream->size + 4);
-	stream->buffer[stream->size] = (value >> 24) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 16) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 8) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = value & 0xff;
-	++stream->size;
+    return binary_stream_read_u8(stream, (uint8_t *) output);
 }
 
-void put_int_le(int32_t value, binary_stream_t *stream)
+void binary_stream_write_bool(binary_stream_t *stream, bool input)
 {
-	put_unsigned_int_le(value & 0xffffffff, stream);
+    binary_stream_write_u8(stream, *((uint8_t *) &input));
 }
 
-void put_int_be(int32_t value, binary_stream_t *stream)
+bool binary_stream_read_varint32(binary_stream_t *stream, uint32_t *output)
 {
-	put_unsigned_int_be(value & 0xffffffff, stream);
+    uint32_t value = 0;
+    uint8_t i;
+    uint8_t to_read;
+    for (i = 0; i < 35; i += 7) {
+        if (!binary_stream_read_u8(stream, &to_read)) {
+            return false;
+        }
+        value |= ((uint32_t) (to_read & 0x7f)) << i;
+        if ((to_read & 0x80) == 0) {
+            *output = value;
+            return true;
+        }
+    }
+    return false;
+}
+    
+void binary_stream_write_varint32(binary_stream_t *stream, uint32_t input)
+{
+    uint32_t value = input;
+    uint8_t i;
+    for (i = 0; i < 5; ++i) {
+        uint8_t to_write = (uint8_t) (value & 0x7f);
+        value >>= 7;
+        if (value != 0) {
+            binary_stream_write_u8(stream, to_write | 0x80);
+        } else {
+            binary_stream_write_u8(stream, to_write);
+            break;
+        }
+    }
 }
 
-void put_unsigned_long_le(uint64_t value, binary_stream_t *stream)
+bool binary_stream_read_zigzag32(binary_stream_t *stream, int32_t *output)
 {
-	stream->buffer = (int8_t *) realloc(stream->buffer, stream->size + 8);
-	stream->buffer[stream->size] = value & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 8) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 16) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 24) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 32) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 40) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 48) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 56) & 0xff;
-	++stream->size;
+    uint32_t raw;
+    if (!binary_stream_read_varint32(stream, &raw)) {
+        return false;
+    }
+    uint32_t temp = ((raw & 1) == 1) ? (~(raw >> 1)) : (raw >> 1);
+    *output = *((int32_t *) &temp);
+    return true;
 }
 
-void put_unsigned_long_be(uint64_t value, binary_stream_t *stream)
+void binary_stream_write_zigzag32(binary_stream_t *stream, int32_t input)
 {
-	stream->buffer = (int8_t *) realloc(stream->buffer, stream->size + 8);
-	stream->buffer[stream->size] = (value >> 56) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 48) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 40) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 32) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 24) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 16) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = (value >> 8) & 0xff;
-	++stream->size;
-	stream->buffer[stream->size] = value & 0xff;
-	++stream->size;
+    uint32_t raw = (input >= 0) ? ((*((uint32_t *) &input)) << 1) : (((~(*((uint32_t *) &input))) << 1) | 1);
+    binary_stream_write_varint32(stream, raw);
 }
 
-void put_long_le(int64_t value, binary_stream_t *stream)
+bool binary_stream_read_varint64(binary_stream_t *stream, uint64_t *output)
 {
-	put_unsigned_long_le(value & 0xffffffffffffffff, stream);
+    uint64_t value = 0;
+    uint8_t i;
+    uint8_t to_read;
+    for (i = 0; i < 70; i += 7) {
+        if (!binary_stream_read_u8(stream, &to_read)) {
+            return false;
+        }
+        value |= ((uint64_t) (to_read & 0x7f)) << i;
+        if ((to_read & 0x80) == 0) {
+            *output = value;
+            return true;
+        }
+    }
+    return false;
+}
+    
+void binary_stream_write_varint64(binary_stream_t *stream, uint64_t input)
+{
+    uint64_t value = input;
+    uint8_t i;
+    for (i = 0; i < 10; ++i) {
+        uint8_t to_write = (uint8_t) (value & 0x7f);
+        value >>= 7;
+        if (value != 0) {
+            binary_stream_write_u8(stream, to_write | 0x80);
+        } else {
+            binary_stream_write_u8(stream, to_write);
+            break;
+        }
+    }
 }
 
-void put_long_be(int64_t value, binary_stream_t *stream)
+bool binary_stream_read_zigzag64(binary_stream_t *stream, int64_t *output)
 {
-	put_unsigned_long_be(value & 0xffffffffffffffff, stream);
+    uint64_t raw;
+    if (!binary_stream_read_varint64(stream, &raw)) {
+        return false;
+    }
+    uint64_t temp = ((raw & 1) == 1) ? (~(raw >> 1)) : (raw >> 1);
+    *output = *((int64_t *) &temp);
+    return true;
 }
 
-void put_var_int(uint32_t value, binary_stream_t *stream)
+void binary_stream_write_zigzag64(binary_stream_t *stream, int64_t input)
 {
-	value &= 0xffffffff;
-	int i;
-	for (i = 0; i < 5; ++i) {
-		uint8_t to_write = value & 0x7f;
-		value >>= 7;
-		stream->buffer = (int8_t *) realloc(stream->buffer, stream->size + 1);
-		if (value != 0) {
-			stream->buffer[stream->size] = (to_write | 0x80);
-			++stream->size;
-		} else {
-			stream->buffer[stream->size] = to_write;
-			++stream->size;
-			break;
-		}
-	}
+    uint64_t raw = (input >= 0) ? ((*((uint64_t *) &input)) << 1) : (((~(*((uint64_t *) &input))) << 1) | 1);
+    binary_stream_write_varint64(stream, raw);
 }
 
-void put_signed_var_int(int32_t value, binary_stream_t *stream)
+bool binary_stream_is_end_of_stream(binary_stream_t *stream)
 {
-	put_var_int(value >= 0 ? (((uint32_t) value) << 1) : ((((uint32_t) (-1 - value)) << 1) | 0x01), stream);
+    return (stream->offset < stream->size);
 }
 
-void put_var_long(uint64_t value, binary_stream_t *stream)
+void binary_stream_construct(binary_stream_t *stream)
 {
-	value &= 0xffffffffffffffff;
-	int i;
-	for (i = 0; i < 10; ++i) {
-		uint8_t to_write = value & 0x7f;
-		value >>= 7;
-		stream->buffer = (int8_t *) realloc(stream->buffer, stream->size + 1);
-		if (value != 0) {
-			stream->buffer[stream->size] = (to_write | 0x80);
-			++stream->size;
-		} else {
-			stream->buffer[stream->size] = to_write;
-			++stream->size;
-			break;
-		}
-	}
+    stream->buffer = malloc(0);
+    stream->offset = 0;
+    stream->size = 0;
 }
 
-void put_signed_var_long(int64_t value, binary_stream_t *stream)
+void binary_stream_deconstruct(binary_stream_t *stream)
 {
-	put_var_long(value >= 0 ? (((uint64_t) value) << 1) : ((((uint64_t) (-1 - value)) << 1) | 0x01), stream);
-}
-
-void put_float_le(float value, binary_stream_t *stream)
-{
-	uint32_t i;
-	memcpy(&i, &value, sizeof(i));
-	put_unsigned_int_le(i, stream);
-}
-
-void put_float_be(float value, binary_stream_t *stream)
-{
-	uint32_t i;
-	memcpy(&i, &value, sizeof(i));
-	put_unsigned_int_be(i, stream);
-}
-
-void put_double_le(double value, binary_stream_t *stream)
-{
-	uint64_t l;
-	memcpy(&l, &value, sizeof(l));
-	put_unsigned_long_le(l, stream);
-}
-
-void put_double_be(double value, binary_stream_t *stream)
-{
-	uint64_t l;
-	memcpy(&l, &value, sizeof(l));
-	put_unsigned_long_be(l, stream);
+    free(stream->buffer);
+    stream->offset = 0;
+    stream->size = 0;
 }
 
 #ifdef __cplusplus

@@ -4,139 +4,134 @@
    This file is licensed under the MIT license
  */
 
-#ifndef BINARY_STREAM_H
-#define BINARY_STREAM_H
+#ifndef MFDGAMING_BINARY_STREAM_H
+#define MFDGAMING_BINARY_STREAM_H
 
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
-
-typedef struct {
-	int8_t *buffer;
-	size_t size;
-	size_t offset;
-} binary_stream_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int8_t *get_bytes(size_t count, binary_stream_t *stream);
+typedef struct binary_stream {
+    uint8_t *buffer;
+    size_t size;
+    size_t offset;
+} binary_stream_t;
 
-int8_t *get_remaining_bytes(binary_stream_t *stream);
+bool binary_stream_read(binary_stream_t *stream, size_t size, uint8_t **output);
 
-uint8_t get_unsigned_byte(binary_stream_t *stream);
+void binary_stream_write(binary_stream_t *stream, uint8_t *buffer, size_t size);
 
-int8_t get_byte(binary_stream_t *stream);
+bool binary_stream_read_u8(binary_stream_t *stream, uint8_t *output);
 
-bool get_bool(binary_stream_t *stream);
+void binary_stream_write_u8(binary_stream_t *stream, uint8_t input);
 
-uint16_t get_unsigned_short_le(binary_stream_t *stream);
+bool binary_stream_read_i8(binary_stream_t *stream, int8_t *output);
 
-uint16_t get_unsigned_short_be(binary_stream_t *stream);
+void binary_stream_write_i8(binary_stream_t *stream, int8_t input);
 
-int16_t get_short_le(binary_stream_t *stream);
+bool binary_stream_read_u16le(binary_stream_t *stream, uint16_t *output);
 
-int16_t get_short_be(binary_stream_t *stream);
+void binary_stream_write_u16le(binary_stream_t *stream, uint16_t input);
 
-uint32_t get_unsigned_triad_le(binary_stream_t *stream);
+bool binary_stream_read_i16le(binary_stream_t *stream, int16_t *output);
 
-uint32_t get_unsigned_triad_be(binary_stream_t *stream);
+void binary_stream_write_i16le(binary_stream_t *stream, int16_t input);
 
-int32_t get_triad_le(binary_stream_t *stream);
+bool binary_stream_read_u16be(binary_stream_t *stream, uint16_t *output);
 
-int32_t get_triad_be(binary_stream_t *stream);
+void binary_stream_write_u16be(binary_stream_t *stream, uint16_t input);
 
-uint32_t get_unsigned_int_le(binary_stream_t *stream);
+bool binary_stream_read_i16be(binary_stream_t *stream, int16_t *output);
 
-uint32_t get_unsigned_int_be(binary_stream_t *stream);
+void binary_stream_write_i16be(binary_stream_t *stream, int16_t input);
 
-int32_t get_int_le(binary_stream_t *stream);
+bool binary_stream_read_u24le(binary_stream_t *stream, uint32_t *output);
 
-int32_t get_int_be(binary_stream_t *stream);
+void binary_stream_write_u24le(binary_stream_t *stream, uint32_t input);
 
-uint64_t get_unsigned_long_le(binary_stream_t *stream);
+bool binary_stream_read_u24be(binary_stream_t *stream, uint32_t *output);
 
-uint64_t get_unsigned_long_be(binary_stream_t *stream);
+void binary_stream_write_u24be(binary_stream_t *stream, uint32_t input);
 
-int64_t get_long_le(binary_stream_t *stream);
+bool binary_stream_read_u32le(binary_stream_t *stream, uint32_t *output);
 
-int64_t get_long_be(binary_stream_t *stream);
+void binary_stream_write_u32le(binary_stream_t *stream, uint32_t input);
 
-uint32_t get_var_int(binary_stream_t *stream);
+bool binary_stream_read_i32le(binary_stream_t *stream, int32_t *output);
 
-int32_t get_signed_var_int(binary_stream_t *stream);
+void binary_stream_write_i32le(binary_stream_t *stream, int32_t input);
 
-uint64_t get_var_long(binary_stream_t *stream);
+bool binary_stream_read_u32be(binary_stream_t *stream, uint32_t *output);
 
-int64_t get_signed_var_long(binary_stream_t *stream);
+void binary_stream_write_u32be(binary_stream_t *stream, uint32_t input);
 
-float get_float_le(binary_stream_t *stream);
+bool binary_stream_read_i32be(binary_stream_t *stream, int32_t *output);
 
-float get_float_be(binary_stream_t *stream);
+void binary_stream_write_i32be(binary_stream_t *stream, int32_t input);
 
-double get_double_le(binary_stream_t *stream);
+bool binary_stream_read_u64le(binary_stream_t *stream, uint64_t *output);
 
-double get_double_be(binary_stream_t *stream);
+void binary_stream_write_u64le(binary_stream_t *stream, uint64_t input);
 
-void put_bytes(int8_t *data, size_t size, binary_stream_t *stream);
+bool binary_stream_read_i64le(binary_stream_t *stream, int64_t *output);
 
-void put_unsigned_byte(uint8_t value, binary_stream_t *stream);
+void binary_stream_write_i64le(binary_stream_t *stream, int64_t input);
 
-void put_byte(int8_t value, binary_stream_t *stream);
+bool binary_stream_read_u64be(binary_stream_t *stream, uint64_t *output);
 
-void put_bool(bool value, binary_stream_t *stream);
+void binary_stream_write_u64be(binary_stream_t *stream, uint64_t input);
 
-void put_unsigned_short_le(uint16_t value, binary_stream_t *stream);
+bool binary_stream_read_i64be(binary_stream_t *stream, int64_t *output);
 
-void put_unsigned_short_be(uint16_t value, binary_stream_t *stream);
+void binary_stream_write_i64be(binary_stream_t *stream, int64_t input);
 
-void put_short_le(int16_t value, binary_stream_t *stream);
+bool binary_stream_read_f32le(binary_stream_t *stream, float *output);
 
-void put_short_be(int16_t value, binary_stream_t *stream);
+void binary_stream_write_f32le(binary_stream_t *stream, float input);
 
-void put_unsigned_triad_le(uint32_t value, binary_stream_t *stream);
+bool binary_stream_read_f32be(binary_stream_t *stream, float *output);
 
-void put_unsigned_triad_be(uint32_t value, binary_stream_t *stream);
+void binary_stream_write_f32be(binary_stream_t *stream, float input);
 
-void put_triad_le(int32_t value, binary_stream_t *stream);
+bool binary_stream_read_f64le(binary_stream_t *stream, double *output);
 
-void put_triad_be(int32_t value, binary_stream_t *stream);
+void binary_stream_write_f64le(binary_stream_t *stream, double input);
 
-void put_unsigned_int_le(uint32_t value, binary_stream_t *stream);
+bool binary_stream_read_f64be(binary_stream_t *stream, double *output);
 
-void put_unsigned_int_be(uint32_t value, binary_stream_t *stream);
+void binary_stream_write_f64be(binary_stream_t *stream, double input);
 
-void put_int_le(int32_t value, binary_stream_t *stream);
+bool binary_stream_read_bool(binary_stream_t *stream, bool *output);
 
-void put_int_be(int32_t value, binary_stream_t *stream);
+void binary_stream_write_bool(binary_stream_t *stream, bool input);
 
-void put_unsigned_long_le(uint64_t value, binary_stream_t *stream);
+bool binary_stream_read_varint32(binary_stream_t *stream, uint32_t *output);
+    
+void binary_stream_write_varint32(binary_stream_t *stream, uint32_t input);
 
-void put_unsigned_long_be(uint64_t value, binary_stream_t *stream);
+bool binary_stream_read_zigzag32(binary_stream_t *stream, int32_t *output);
 
-void put_long_le(int64_t value, binary_stream_t *stream);
+void binary_stream_write_zigzag32(binary_stream_t *stream, int32_t input);
 
-void put_long_be(int64_t value, binary_stream_t *stream);
+bool binary_stream_read_varint64(binary_stream_t *stream, uint64_t *output);
+    
+void binary_stream_write_varint64(binary_stream_t *stream, uint64_t input);
 
-void put_var_int(uint32_t value, binary_stream_t *stream);
+bool binary_stream_read_zigzag64(binary_stream_t *stream, int64_t *output);
 
-void put_signed_var_int(int32_t value, binary_stream_t *stream);
+void binary_stream_write_zigzag64(binary_stream_t *stream, int64_t input);
 
-void put_var_long(uint64_t value, binary_stream_t *stream);
+bool binary_stream_is_end_of_stream(binary_stream_t *stream);
 
-void put_signed_var_long(int64_t value, binary_stream_t *stream);
+void binary_stream_construct(binary_stream_t *stream);
 
-void put_float_le(float value, binary_stream_t *stream);
-
-void put_float_be(float value, binary_stream_t *stream);
-
-void put_double_le(double value, binary_stream_t *stream);
-
-void put_double_be(double value, binary_stream_t *stream);
+void binary_stream_deconstruct(binary_stream_t *stream);
 
 #ifdef __cplusplus
 }
 #endif
-	
+
 #endif
