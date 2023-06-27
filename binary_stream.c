@@ -8,6 +8,9 @@
 #include <string.h>
 #include "./binary_stream.h"
 
+#define CLOSEST_MULTIPLE(n, m)(n <= m ? m : ((n + m / 2) - ((n + m / 2) % m)))
+#define BLOCK_SIZE 512
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -17,17 +20,27 @@ bool binary_stream_read(binary_stream_t *stream, size_t size, uint8_t **output)
     if ((stream->offset + size) <= stream->size) {
         *output = stream->buffer + stream->offset;
         stream->offset += size;
-	return true;
+        return true;
     }
     return false;
 }
 
 void binary_stream_write(binary_stream_t *stream, uint8_t *buffer, size_t size)
 {
-    size_t old_size = stream->size;
-    stream->size += size;
-    stream->buffer = (uint8_t *) realloc(stream->buffer, stream->size);
-    memcpy(stream->buffer + old_size, buffer, size);
+    if (stream->buffer == NULL || stream->storage_size == 0) {
+        stream->size = size;
+        stream->storage_size = CLOSEST_MULTIPLE(size, BLOCK_SIZE);
+        stream->buffer = (uint8_t *)malloc(stream->storage_size);
+        memcpy(stream->buffer, buffer, size);
+    } else {
+        size_t old_size = stream->size;
+        stream->size += size;
+        if (stream->size > stream->storage_size) {
+            stream->storage_size = CLOSEST_MULTIPLE(stream->size, BLOCK_SIZE);
+            stream->buffer = (uint8_t *)realloc(stream->storage_size);
+        }
+        memcpy(&stream->buffer[old_size], buffer, size);
+    }
 }
 
 bool binary_stream_read_u8(binary_stream_t *stream, uint8_t *output)
@@ -435,16 +448,20 @@ bool binary_stream_is_end_of_stream(binary_stream_t *stream)
 
 void binary_stream_construct(binary_stream_t *stream)
 {
-    stream->buffer = malloc(0);
-    stream->offset = 0;
+    stream->buffer = NULL;
     stream->size = 0;
+    stream->storage_size = 0;
+    stream->offset = 0;
 }
 
 void binary_stream_deconstruct(binary_stream_t *stream)
 {
-    free(stream->buffer);
-    stream->offset = 0;
+    if (stream->buffer != NULL) {
+        free(stream->buffer);
+    }
     stream->size = 0;
+    stream->storage_size = 0;
+    stream->offset = 0;
 }
 
 #ifdef __cplusplus

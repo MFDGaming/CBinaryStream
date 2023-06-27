@@ -17,6 +17,7 @@ extern "C" {
 typedef struct binary_stream {
     uint8_t *buffer;
     size_t size;
+    size_t storage_size;
     size_t offset;
 } binary_stream_t;
 
