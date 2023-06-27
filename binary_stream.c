@@ -46,10 +46,10 @@ void binary_stream_write(binary_stream_t *stream, uint8_t *buffer, size_t size)
 bool binary_stream_read_u8(binary_stream_t *stream, uint8_t *output)
 {
     uint8_t *out;
-    bool has_error = binary_stream_read(stream, 1, &out);
-    if (has_error)
+    bool no_error = binary_stream_read(stream, 1, &out);
+    if (no_error)
         *output = out[0];
-    return has_error;
+    return no_error;
 }
 
 void binary_stream_write_u8(binary_stream_t *stream, uint8_t input)
@@ -70,10 +70,10 @@ void binary_stream_write_i8(binary_stream_t *stream, int8_t input)
 bool binary_stream_read_u16le(binary_stream_t *stream, uint16_t *output)
 {
     uint8_t *out;
-    bool has_error = binary_stream_read(stream, 2, &out);
-    if (has_error)
+    bool no_error = binary_stream_read(stream, 2, &out);
+    if (no_error)
         *output = ((uint16_t) out[0]) | (((uint16_t) out[1]) << 8);
-    return has_error;
+    return no_error;
 }
 
 void binary_stream_write_u16le(binary_stream_t *stream, uint16_t input)
@@ -98,10 +98,10 @@ void binary_stream_write_i16le(binary_stream_t *stream, int16_t input)
 bool binary_stream_read_u16be(binary_stream_t *stream, uint16_t *output)
 {
     uint8_t *out;
-    bool has_error = binary_stream_read(stream, 2, &out);
-    if (has_error)
+    bool no_error = binary_stream_read(stream, 2, &out);
+    if (no_error)
         *output =  (((uint16_t) out[0]) << 8) | ((uint16_t) out[1]);
-    return has_error;
+    return no_error;
 }
 
 void binary_stream_write_u16be(binary_stream_t *stream, uint16_t input)
@@ -126,10 +126,10 @@ void binary_stream_write_i16be(binary_stream_t *stream, int16_t input)
 bool binary_stream_read_u24le(binary_stream_t *stream, uint32_t *output)
 {
     uint8_t *out;
-    bool has_error = binary_stream_read(stream, 3, &out);
-    if (has_error)
+    bool no_error = binary_stream_read(stream, 3, &out);
+    if (no_error)
         *output = ((uint32_t) out[0]) | (((uint32_t) out[1]) << 8) | (((uint32_t) out[2]) << 16);
-    return has_error;
+    return no_error;
 }
 
 void binary_stream_write_u24le(binary_stream_t *stream, uint32_t input)
@@ -142,13 +142,34 @@ void binary_stream_write_u24le(binary_stream_t *stream, uint32_t input)
     binary_stream_write(stream, byte_array, 3);
 }
 
+bool binary_stream_read_i24le(binary_stream_t *stream, int32_t *output)
+{
+    int32_t value;
+    bool no_error = binary_stream_read_u24le(stream, (uint32_t *) value);
+    if (no_error) {
+        if (value > 0x7fffff) {
+            value -= 0x1000000;
+        }
+        *output = value;
+    }
+    return no_error;
+}
+
+void binary_stream_write_i24le(binary_stream_t *stream, int32_t input)
+{
+    if (input < 0) {
+        input += 0x1000000;
+    }
+    binary_stream_write_u24le(stream, *((uint32_t *) &input));
+}
+
 bool binary_stream_read_u24be(binary_stream_t *stream, uint32_t *output)
 {
     uint8_t *out;
-    bool has_error = binary_stream_read(stream, 3, &out);
-    if (has_error)
+    bool no_error = binary_stream_read(stream, 3, &out);
+    if (no_error)
         *output = (((uint32_t) out[0]) << 16) | (((uint32_t) out[1]) << 8) | ((uint32_t) out[2]);
-    return has_error;
+    return no_error;
 }
 
 void binary_stream_write_u24be(binary_stream_t *stream, uint32_t input)
@@ -161,13 +182,34 @@ void binary_stream_write_u24be(binary_stream_t *stream, uint32_t input)
     binary_stream_write(stream, byte_array, 3);
 }
 
+bool binary_stream_read_i24be(binary_stream_t *stream, int32_t *output)
+{
+    int32_t value;
+    bool no_error = binary_stream_read_u24be(stream, (uint32_t *) value);
+    if (no_error) {
+        if (value > 0x7fffff) {
+            value -= 0x1000000;
+        }
+        *output = value;
+    }
+    return no_error;
+}
+
+void binary_stream_write_i24be(binary_stream_t *stream, int32_t input)
+{
+    if (input < 0) {
+        input += 0x1000000;
+    }
+    binary_stream_write_u24be(stream, *((uint32_t *) &input));
+}
+
 bool binary_stream_read_u32le(binary_stream_t *stream, uint32_t *output)
 {
     uint8_t *out;
-    bool has_error = binary_stream_read(stream, 4, &out);
-    if (has_error)
+    bool no_error = binary_stream_read(stream, 4, &out);
+    if (no_error)
         *output = ((uint32_t) out[0]) | (((uint32_t) out[1]) << 8) | (((uint32_t) out[2]) << 16) | (((uint32_t) out[3]) << 24);
-    return has_error;
+    return no_error;
 }
 
 void binary_stream_write_u32le(binary_stream_t *stream, uint32_t input)
@@ -194,10 +236,10 @@ void binary_stream_write_i32le(binary_stream_t *stream, int32_t input)
 bool binary_stream_read_u32be(binary_stream_t *stream, uint32_t *output)
 {
     uint8_t *out;
-    bool has_error = binary_stream_read(stream, 4, &out);
-    if (has_error)
+    bool no_error = binary_stream_read(stream, 4, &out);
+    if (no_error)
         *output = (((uint32_t) out[0]) << 24) | (((uint32_t) out[1]) << 16) | (((uint32_t) out[2]) << 8) | ((uint32_t) out[3]);
-    return has_error;
+    return no_error;
 }
 
 void binary_stream_write_u32be(binary_stream_t *stream, uint32_t input)
@@ -224,10 +266,10 @@ void binary_stream_write_i32be(binary_stream_t *stream, int32_t input)
 bool binary_stream_read_u64le(binary_stream_t *stream, uint64_t *output)
 {
     uint8_t *out;
-    bool has_error = binary_stream_read(stream, 8, &out);
-    if (has_error)
+    bool no_error = binary_stream_read(stream, 8, &out);
+    if (no_error)
         *output = ((uint64_t) out[0]) | (((uint64_t) out[1]) << 8) | (((uint64_t) out[2]) << 16) | (((uint64_t) out[3]) << 24) | (((uint64_t) out[4]) << 32) | (((uint64_t) out[5]) << 40) | (((uint64_t) out[6]) << 48) | (((uint64_t) out[7]) << 56);
-    return has_error;
+    return no_error;
 }
 
 void binary_stream_write_u64le(binary_stream_t *stream, uint64_t input)
@@ -258,10 +300,10 @@ void binary_stream_write_i64le(binary_stream_t *stream, int64_t input)
 bool binary_stream_read_u64be(binary_stream_t *stream, uint64_t *output)
 {
     uint8_t *out;
-    bool has_error = binary_stream_read(stream, 8, &out);
-    if (has_error)
+    bool no_error = binary_stream_read(stream, 8, &out);
+    if (no_error)
         *output = (((uint64_t) out[0]) << 56) | (((uint64_t) out[1]) << 48) | (((uint64_t) out[2]) << 40) | (((uint64_t) out[3]) << 32) | (((uint64_t) out[4]) << 24) | (((uint64_t) out[5]) << 16) | (((uint64_t) out[6]) << 8) | ((uint64_t) out[7]);
-    return has_error;
+    return no_error;
 }
 
 void binary_stream_write_u64be(binary_stream_t *stream, uint64_t input)
