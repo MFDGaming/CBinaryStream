@@ -37,7 +37,7 @@ void binary_stream_write(binary_stream_t *stream, uint8_t *buffer, size_t size)
         stream->size += size;
         if (stream->size > stream->storage_size) {
             stream->storage_size = CLOSEST_MULTIPLE(stream->size, BLOCK_SIZE);
-            stream->buffer = (uint8_t *)realloc(stream->storage_size);
+            stream->buffer = (uint8_t *)realloc(stream->buffer, stream->storage_size);
         }
         memcpy(&stream->buffer[old_size], buffer, size);
     }
@@ -145,7 +145,7 @@ void binary_stream_write_u24le(binary_stream_t *stream, uint32_t input)
 bool binary_stream_read_i24le(binary_stream_t *stream, int32_t *output)
 {
     int32_t value;
-    bool no_error = binary_stream_read_u24le(stream, (uint32_t *) value);
+    bool no_error = binary_stream_read_u24le(stream, (uint32_t *) &value);
     if (no_error) {
         if (value > 0x7fffff) {
             value -= 0x1000000;
@@ -185,7 +185,7 @@ void binary_stream_write_u24be(binary_stream_t *stream, uint32_t input)
 bool binary_stream_read_i24be(binary_stream_t *stream, int32_t *output)
 {
     int32_t value;
-    bool no_error = binary_stream_read_u24be(stream, (uint32_t *) value);
+    bool no_error = binary_stream_read_u24be(stream, (uint32_t *) &value);
     if (no_error) {
         if (value > 0x7fffff) {
             value -= 0x1000000;
