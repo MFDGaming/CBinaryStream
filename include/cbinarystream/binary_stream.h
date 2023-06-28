@@ -4,8 +4,8 @@
    This file is licensed under the MIT license
  */
 
-#ifndef MFDGAMING_BINARY_STREAM_H
-#define MFDGAMING_BINARY_STREAM_H
+#ifndef CBINARYSTREAM_BINARY_STREAM_H
+#define CBINARYSTREAM_BINARY_STREAM_H
 
 #ifdef __cplusplus
 extern "C" {

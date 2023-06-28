@@ -4,9 +4,9 @@
    This file is licensed under the MIT license
  */
 
-#include "binary_stream.h"
-#include <stdio.h>
 #include <assert.h>
+#include <cbinarystream/binary_stream.h>
+#include <stdio.h>
 
 int main () {
     uint8_t u8_value;

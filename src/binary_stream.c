@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-#include "./binary_stream.h"
+#include <cbinarystream/binary_stream.h>
 #include <string.h>
 
 #define CLOSEST_MULTIPLE(n, m)(n <= m ? m : ((n + m / 2) - ((n + m / 2) % m)))
