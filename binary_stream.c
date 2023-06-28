@@ -4,16 +4,15 @@
    This file is licensed under the MIT license
  */
 
-#include <stdbool.h>
-#include <string.h>
-#include "./binary_stream.h"
-
-#define CLOSEST_MULTIPLE(n, m)(n <= m ? m : ((n + m / 2) - ((n + m / 2) % m)))
-#define BLOCK_SIZE 512
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "./binary_stream.h"
+#include <string.h>
+
+#define CLOSEST_MULTIPLE(n, m)(n <= m ? m : ((n + m / 2) - ((n + m / 2) % m)))
+#define BLOCK_SIZE 512
 
 bool binary_stream_read(binary_stream_t *stream, size_t size, uint8_t **output)
 {

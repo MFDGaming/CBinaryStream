@@ -7,12 +7,13 @@
 #ifndef MFDGAMING_BINARY_STREAM_H
 #define MFDGAMING_BINARY_STREAM_H
 
-#include <stdint.h>
-#include <stdlib.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
 
 typedef struct binary_stream {
     uint8_t *buffer;
@@ -53,9 +54,17 @@ bool binary_stream_read_u24le(binary_stream_t *stream, uint32_t *output);
 
 void binary_stream_write_u24le(binary_stream_t *stream, uint32_t input);
 
+bool binary_stream_read_i24le(binary_stream_t *stream, int32_t *output);
+
+void binary_stream_write_i24le(binary_stream_t *stream, int32_t input);
+
 bool binary_stream_read_u24be(binary_stream_t *stream, uint32_t *output);
 
 void binary_stream_write_u24be(binary_stream_t *stream, uint32_t input);
+
+bool binary_stream_read_i24be(binary_stream_t *stream, int32_t *output);
+
+void binary_stream_write_i24be(binary_stream_t *stream, int32_t input);
 
 bool binary_stream_read_u32le(binary_stream_t *stream, uint32_t *output);
 
